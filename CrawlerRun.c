@@ -21,7 +21,8 @@ struct mainll{
 	struct urlinfo* info;
 	struct mainll* next;
 	struct mainll* prev;
-}*start=NULL;
+}
+*start=NULL;
 
 struct hash{
 	struct mainll* begin;
@@ -31,12 +32,9 @@ struct hash{
 void addinfo(char* a,char* b,struct mainll* node){
 	int i;
 	struct urlinfo* m = malloc(sizeof(struct urlinfo));
-	//memset(m,0,(sizeof(struct urlinfo)));
 	m->url= malloc(strlen(a)+1);
-	//memset(m->url,0,(strlen(a)+1));
-	for(i=0;i<strlen(a);i++){
+	for(i=0;i<strlen(a);i++)
 		m->url[i]=a[i];
-	}
 	m->url[i]='\0';
 	m->vis=0;
 	m->depth=b[0]-48;
@@ -60,7 +58,6 @@ void insertll(char* a,char* b){
 	int key=genkey(a),dep=b[0]-48,flag=0;
 	if(dep<=2){
 		struct mainll* m = malloc(sizeof(struct mainll));
-		//memset(m,0,sizeof(struct mainll));
 		addinfo(a,b,m);
 		if(start==NULL){
 			start=m;
@@ -124,7 +121,7 @@ void getpage(char *url){
 	char urlbuffer[URL_LENGTH+300]={0};   
 	strcat(urlbuffer, "wget ");
 	strcat(urlbuffer, url);
-	strcat(urlbuffer," -O /home/lakshay/haha/temp.txt ");
+	strcat(urlbuffer," -O /home/temp.txt ");
 	system(urlbuffer);
 }
    
@@ -138,7 +135,7 @@ void testDir(char *dir){
 		exit(1);
 	}
    
-      //Both check if there's a directory and if it's writable
+      	//Both check if there's a directory and if it's writable
 	if(!S_ISDIR(statbuf.st_mode)){
 		fprintf(stderr, "-----------------------------------------------------\n");
 		fprintf(stderr, "Invalid directory entry. Your input isn't a directory\n");
@@ -191,7 +188,6 @@ int checkURL(char a[]){
 
 char* getcURL(FILE* fp1){
 	char *u=malloc(URL_LENGTH + 1);
-	//memset(u,0,(URL_LENGTH+1));
 	char a=fgetc(fp1);
 	int i=0;
 	while(a!='\n'){
@@ -224,7 +220,7 @@ return d;
 void NormalizeWord(char* word) {
       int i = 0;
       while (word[i]) {
-              // NEW
+        // NEW
         if (word[i] < 91 && word[i] > 64) // Bounded below so this funct. can run on all urls
           // /NEW
           word[i] += 32;
@@ -232,8 +228,7 @@ void NormalizeWord(char* word) {
       }
 }
 
-int NormalizeURL(char* URL)
-{
+int NormalizeURL(char* URL){
       int len = strlen(URL);
       if (len <= 1 )
         return 0;
@@ -274,7 +269,7 @@ int NormalizeURL(char* URL)
         }
       }
       return 1;
-    }
+}
    
 void removeWhiteSpace(char* html){
       int i;
@@ -402,50 +397,41 @@ int GetNextURL(char* html, char* urlofthispage, char* result, int pos){
   return -1;
 }
 
-long long int getsize()
-{
+long long int getsize(){
     struct stat st; //variable which will count length of file.
-    stat("/home/lakshay/haha/temp.txt",&st); // temp.txt is the file where wget fetch the html
+    stat("/home/temp.txt",&st); // temp.txt is the file where wget fetch the html
     long long int file_size=st.st_size;
 return file_size;
 }
-
-
-
 
 //first get a new url by getnexturl func
 //then check if(this url already exists in the array
 //after array is ready hash all
 //function used -> int GetNextURL(char* html, char* urlofthispage, char* result, int pos)
-void extractpages(FILE* fp1)
-{
+void extractpages(FILE* fp1){
     //get url and depth
     char *a=malloc(URL_LENGTH+1),n;
-	//memset(a,0,URL_LENGTH + 1);
+
     a=getcURL(fp1);
     char *d=malloc(2);
-	//memset(d,0,2);
     d[0]=getdepth(fp1);
     d[1]='\0';
    long long int size=getsize();
 
     char* html=malloc(size+500);
-	//memset(html,0,(size+1));
     size=0;
    
-    do
-        {
+    do{
         n=fgetc(fp1);
         html[size++]=n;
-        }
+    }
     while(n!=EOF);
    
     html[size]='\0';
     char *all[MAX_URL_PER_PAGE];
     int pos=0,i=0;
    
-    while(1)
-        {
+    while(1){
         if(i > MAX_URL_PER_PAGE-1)
             break;
         int flag=0,j;
@@ -455,52 +441,45 @@ void extractpages(FILE* fp1)
         if(pos==-1)
             break;
        
-        for(j=0;j<i;j++)
-        {
+        for(j=0;j<i;j++){
             if(strcmp(turl,all[j])==0 && (strlen(turl)==strlen(all[j])))
                 {flag=1;
                 break;}
         }
         j=0;
-        if(flag==0&&check_page(turl))
-        {
+        if(flag==0&&check_page(turl)){
             all[i]=malloc(strlen(turl)+1);
 			//memset(all,0,(strlen(turl)+1));
-            while(turl[j]!='\0')
-                {
+            while(turl[j]!='\0'){
                 all[i][j]=turl[j];
                 j++;
-                }
+            }
             all[i][j]='\0';
             i++;
         }
 
                
-        }
+    }
 
     int j;
     for(j=0;j<i;j++)
-    {
-    insertll(all[j],d);
-    }
-    //setvisited(a);
+	    insertll(all[j],d);
+
     free(a);
     free(d);
     free(*all);
     struct mainll* m=start;
-    while(m!=NULL)
-    {
-    printf("%s\t%d\t%d\n",m->info->url,m->info->depth,m->info->vis);
-    m=m->next;
+    while(m!=NULL){
+	    printf("%s\t%d\t%d\n",m->info->url,m->info->depth,m->info->vis);
+	    m=m->next;
     }
 }
 
-FILE* filetrans(FILE* fp1,char* url,char* depth)
-{
+FILE* filetrans(FILE* fp1,char* url,char* depth){
     char a;
     static int pageno=0;
     char name[64];
-    sprintf(name, "/home/lakshay/haha/file%d.txt", pageno);
+    sprintf(name, "/home/file%d.txt", pageno);
     pageno++;
     FILE* fp2=fopen(name,"w");
     char st[URL_LENGTH+300]={0};
@@ -511,55 +490,51 @@ FILE* filetrans(FILE* fp1,char* url,char* depth)
     strcat(st, depth);
     strcat(st, "\n");
     fputs(st,fp2);
-    do
-        {
+    
+    do{
         a=fgetc(fp1);
         fputc(a,fp2);
-        }
+    }
     while(a!=EOF);
+    
     fclose(fp1);
     fclose(fp2);
     fp2=fopen(name,"r");
     return fp2;
 }
 
-int main(int argc, char *argv[])
-{
-int i;
-if(checkDEPTH(argv[2])&&checkURL(argv[1])&&checkPARA(argc))
-{
-testDir(argv[3]);
-insertll(argv[1],argv[2]);
+int main(int argc, char *argv[]){
+	int i;
+	if(checkDEPTH(argv[2])&&checkURL(argv[1])&&checkPARA(argc)){
+		testDir(argv[3]);
+		insertll(argv[1],argv[2]);
 
-while(1)
-{
-    int flag=0;
-    struct mainll* m=start;
-    while(m!=NULL)
-        {
-        if(m->info->vis==0)
-            {flag=1;           
-            break;}
-        m=m->next;
-        }
-    if(flag==0) 
-        break;
-    getpage(m->info->url);
-    char* dep=malloc(2);
-	//memset(dep,0,2);
-    dep[0]=m->info->depth+48;
-    dep[1]='\0';
-    FILE *fp1= fopen("/home/lakshay/haha/temp.txt","r");
-    FILE *fp2= filetrans(fp1,m->info->url,dep);
-    m->info->vis=1;
-    extractpages(fp2);
-}
+		while(1){
+		    int flag=0;
+		    struct mainll* m=start;
+		    while(m!=NULL){
+			if(m->info->vis==0){
+				flag=1;           
+				break;
+			}
+			m=m->next;
+		    }
+		    if(flag==0) 
+			break;
+		    getpage(m->info->url);
+		    char* dep=malloc(2);
+		    dep[0]=m->info->depth+48;
+		    dep[1]='\0';
+		    FILE *fp1= fopen("/home/temp.txt","r");
+		    FILE *fp2= filetrans(fp1,m->info->url,dep);
+		    m->info->vis=1;
+		    extractpages(fp2);
+		}
 
 
-}
-else
-printf("\nCheck Arguments\n");
+	}
+	else
+		printf("\nCheck Arguments\n");
 
-
-return 0;
+	return 0;
 }
